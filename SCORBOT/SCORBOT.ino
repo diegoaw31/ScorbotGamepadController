@@ -1,9 +1,9 @@
 #include <String.h>
 
-#define LED 2
-#define EN_1 13
-#define CW_1 14
-#define CCW_1 27
+#define LED 13
+#define EN_1 3
+#define CW_1 4
+#define CCW_1 5
 #define EN_2 4
 #define CW_2 16
 #define CCW_2 17
@@ -60,7 +60,7 @@ class Eje_n
       }
       else if (velocidad < 0)
       {
-          analogWrite(EN, velocidad);
+          analogWrite(EN, -velocidad);
           digitalWrite(CW, LOW);
           digitalWrite(CCW, HIGH);
       }
@@ -111,7 +111,7 @@ Eje_n eje4(EN_4, CW_4, CCW_4, false);
 
 void loop() 
 {
-    /*if (Serial.available() >= 4) { // Check if data is available to read
+    if (Serial.available() >= 4) { // Check if data is available to read
       // Read the incoming string
       Mensaje mando;
       Serial.readBytes(mando.bytes, 4);
@@ -120,8 +120,10 @@ void loop()
       {
         default:
           mando.value = mando.value>>8;
+          mando.value = mando.value>100?255:(mando.value<-100)?-255:0;
           eje1.setSpeed(mando.value);
-          /*
+      }
+      }    /*
           if(mando.code[1] == 'Y')
             eje1.setSpeed(mando.value);
           else if (mando.code[1] == 'X')
@@ -138,7 +140,7 @@ void loop()
         default:
           break;
       }
-    }*/
+    }
   //eje1.setSpeed(32000);
   digitalWrite(CW_1, HIGH);
   digitalWrite(CCW_1, LOW);
@@ -158,7 +160,16 @@ void loop()
   digitalWrite(CW_1, LOW);
   digitalWrite(CCW_1, LOW);
   analogWrite(EN_1, 0);
+  delay(500);*/
+
+  /*eje1.setSpeed(-255);
   delay(500);
+  eje1.setSpeed(0);
+  delay(500);
+  eje1.setSpeed(+255);
+  delay(500);
+  eje1.setSpeed(0);
+  delay(500);*/
 
 }  
       /*if((char*)incomingString[4]=="R")
