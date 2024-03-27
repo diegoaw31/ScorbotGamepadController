@@ -1,18 +1,18 @@
 #include <String.h>
 
-#define LED 13
+#define LED 13  //LED_BUILTIN
 #define EN_1 3
 #define CW_1 4
 #define CCW_1 5
-#define EN_2 4
-#define CW_2 16
-#define CCW_2 17
-#define EN_3 26
-#define CW_3 25
-#define CCW_3 33
-#define EN_4 18
-#define CW_4 19
-#define CCW_4 21
+#define EN_2 0
+#define CW_2 0
+#define CCW_2 0
+#define EN_3 0
+#define CW_3 0
+#define CCW_3 0
+#define EN_4 0
+#define CW_4 0
+#define CCW_4 0
 #define EN_5 0
 #define CW_5 0
 #define CCW_5 0
@@ -39,11 +39,12 @@ class Eje_n
       CCW = pin_CCW;
       vel = 0;
       pwm = 0;
-      invertir = invertir;
+      invertir = invertir_;
   }
   
   void setSpeed(int velocidad) //+-255
   {
+      velocidad = constrain(velocidad, -255, 255);
       velocidad = invertir?-velocidad:velocidad;
 
       if (velocidad == 0)
@@ -79,35 +80,31 @@ union Mensaje
   struct
   {
     char code[2];
-    signed short int value;
+    signed short int value; 
+    //mejor: dividir en 2 bytes y coger parte más significativa, o modificar lo que se envía.
+    //byte hByte;
+    //byte lByte;
   };
 };
 
 void setup() {
+  //LED de control
   pinMode(LED, OUTPUT);
   digitalWrite(LED, LOW);
-  // Declarar las salidas:
-  for(int i: EN_n)
-  {
-    pinMode(i, OUTPUT);
-  }
-  for(int i: CW_n)
-  {
-    pinMode(i, OUTPUT);
-  }
-  for(int i: CCW_n)
-  {
-    pinMode(i, OUTPUT);
-  }
 
+  // Declarar las salidas:
+  for(int i: EN_n){pinMode(i, OUTPUT);}
+  for(int i: CW_n){pinMode(i, OUTPUT);}
+  for(int i: CCW_n){pinMode(i, OUTPUT);}
+  
   Serial.begin(115200);
   digitalWrite(LED, HIGH);
 }
 
-Eje_n eje1(EN_1, CW_1, CCW_1, false);
-Eje_n eje2(EN_2, CW_2, CCW_2, false);
-Eje_n eje3(EN_3, CW_3, CCW_3, false);
-Eje_n eje4(EN_4, CW_4, CCW_4, false);
+Eje_n eje1(EN_1, CW_1, CCW_1);
+Eje_n eje2(EN_2, CW_2, CCW_2);
+Eje_n eje3(EN_3, CW_3, CCW_3);
+Eje_n eje4(EN_4, CW_4, CCW_4);
 
 void loop() 
 {
@@ -120,7 +117,7 @@ void loop()
       {
         default:
           mando.value = mando.value>>8;
-          mando.value = mando.value>100?255:(mando.value<-100)?-255:0;
+          //mando.value = mando.value>100?255:(mando.value<-100)?-255:0;
           eje1.setSpeed(mando.value);
       }
       }    /*
