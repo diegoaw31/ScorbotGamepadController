@@ -1,64 +1,175 @@
-#define EN_1 15
-#define CK_1 2
-#define EN_2 0
-#define CK_2 4
-#define EN_3 16
-#define CK_3 17
-#define EN_4 5
-#define CK_4 18
-#define EN_5 19
-#define CK_5 21
-
-
-int salidas[] = {EN_1, CK_1, EN_2, CK_2, EN_3, CK_3, EN_4, CK_4};
-int entradas[] = {};
-
 #include <String.h>
 
-int EN_n[] = {0, EN_1, EN_2, EN_3, EN_4, EN_5};
-int CK_n[] = {0, CK_1, CK_2, CK_3, CK_4, CK_5};
-int velocidad[] = {0, 0, 0, 0, 0};
+#define LED 13  //LED_BUILTIN
+#define EN_1 3
+#define CW_1 4
+#define CCW_1 5
+#define EN_2 0
+#define CW_2 0
+#define CCW_2 0
+#define EN_3 0
+#define CW_3 0
+#define CCW_3 0
+#define EN_4 0
+#define CW_4 0
+#define CCW_4 0
+#define EN_5 0
+#define CW_5 0
+#define CCW_5 0
 
-//class Motor(int pin_EN)
+int EN_n[] = {0, EN_1, EN_2, EN_3, EN_4};
+int CW_n[] = {0, CW_1, CW_2, CW_3, CW_4};
+int CCW_n[] = {0, CCW_1, CCW_2, CCW_3, CCW_4};
 
-/*class Eje_n(int* v_motor, int pin_EN, int pin_CK)
+class Eje_n
 {
-  Eje_n()
-  {
+    public:
 
+    int EN = 0;
+    int CW = 0;
+    int CCW = 0;
+    int vel = 0;
+    int pwm = 0;
+    bool invertir = false;
+
+  Eje_n(int pin_EN, int pin_CW, int pin_CCW, bool invertir_ = false)
+  {
+      EN = pin_EN;
+      CW = pin_CW;
+      CCW = pin_CCW;
+      vel = 0;
+      pwm = 0;
+      invertir = invertir_;
   }
   
-  if(*v_motor == 0)
+  void setSpeed(int velocidad) //+-255
   {
-    digitalWrite(pin_EN, LOW);
-    digitalWrite(pin_)
+      velocidad = constrain(velocidad, -255, 255);
+      velocidad = invertir?-velocidad:velocidad;
+
+      if (velocidad == 0)
+      {
+          analogWrite(EN, 255);
+          digitalWrite(CW, HIGH);
+          digitalWrite(CCW, HIGH);
+      }
+      else if (velocidad > 0)
+      {
+          analogWrite(EN, velocidad);
+          digitalWrite(CCW, LOW);
+          digitalWrite(CW, HIGH); 
+      }
+      else if (velocidad < 0)
+      {
+          analogWrite(EN, -velocidad);
+          digitalWrite(CW, LOW);
+          digitalWrite(CCW, HIGH);
+      }
+      else
+      {
+          analogWrite(EN, 0);
+          digitalWrite(CW, 0);
+          digitalWrite(CCW, 0);
+      }
   }
-}*/
+};
 
-
-void controlar(int entrada, int salida_en, int salida_ck)
+union Mensaje
 {
-}
+  char bytes[4];
+  struct
+  {
+    char code[2];
+    signed short int value; 
+    //mejor: dividir en 2 bytes y coger parte más significativa, o modificar lo que se envía.
+    //byte hByte;
+    //byte lByte;
+  };
+};
 
 void setup() {
-  // put your setup code here, to run once:
-  for(int i: salidas)
-  {
-    pinMode(i, OUTPUT);
-  }
+  //LED de control
+  pinMode(LED, OUTPUT);
+  digitalWrite(LED, LOW);
+
+  // Declarar las salidas:
+  for(int i: EN_n){pinMode(i, OUTPUT);}
+  for(int i: CW_n){pinMode(i, OUTPUT);}
+  for(int i: CCW_n){pinMode(i, OUTPUT);}
   
   Serial.begin(115200);
+  digitalWrite(LED, HIGH);
 }
 
-int RZ=0;
-int LZ=0;
+Eje_n eje1(EN_1, CW_1, CCW_1);
+Eje_n eje2(EN_2, CW_2, CCW_2);
+Eje_n eje3(EN_3, CW_3, CCW_3);
+Eje_n eje4(EN_4, CW_4, CCW_4);
 
-void loop() {
-
-    if (Serial.available() > 0) { // Check if data is available to read
+void loop() 
+{
+    if (Serial.available() >= 4) { // Check if data is available to read
       // Read the incoming string
-      String incomingString = Serial.readStringUntil('\0');
-      if((char*)incomingString[4]=="R")
+      Mensaje mando;
+      Serial.readBytes(mando.bytes, 4);
+      Serial.write(mando.value);
+      switch (mando.code[0])
+      {
+        default:
+          mando.value = mando.value>>8;
+          //mando.value = mando.value>100?255:(mando.value<-100)?-255:0;
+          eje1.setSpeed(mando.value);
+      }
+      }    /*
+          if(mando.code[1] == 'Y')
+            eje1.setSpeed(mando.value);
+          else if (mando.code[1] == 'X')
+            eje2.setSpeed(mando.value);
+          break;
+
+        case 'R':
+          mando.value = mando.value>>8;
+          if(mando.code[1] == 'Y')
+            eje3.setSpeed(mando.value);
+          else if (mando.code[1] == 'X')
+            eje4.setSpeed(mando.value);
+          break;
+        default:
+          break;
+      }
+    }
+  //eje1.setSpeed(32000);
+  digitalWrite(CW_1, HIGH);
+  digitalWrite(CCW_1, LOW);
+  analogWrite(EN_1, 255);
+  delay(500);
+  //eje1.setSpeed(0);
+  digitalWrite(CW_1, LOW);
+  digitalWrite(CCW_1, LOW);
+  analogWrite(EN_1, 0);
+  delay(500);
+  //eje1.setSpeed(-32000);
+  digitalWrite(CW_1, LOW);
+  digitalWrite(CCW_1, HIGH);
+  analogWrite(EN_1, 255);
+  delay(500);
+  //eje1.setSpeed(0);
+  digitalWrite(CW_1, LOW);
+  digitalWrite(CCW_1, LOW);
+  analogWrite(EN_1, 0);
+  delay(500);*/
+
+  /*eje1.setSpeed(-255);
+  delay(500);
+  eje1.setSpeed(0);
+  delay(500);
+  eje1.setSpeed(+255);
+  delay(500);
+  eje1.setSpeed(0);
+  delay(500);*/
+
+}  
+      /*if((char*)incomingString[4]=="R")
       {
         incomingString = incomingString.substring(6, incomingString.length()-1);
         RZ = incomingString.toInt();
@@ -69,14 +180,6 @@ void loop() {
         incomingString = incomingString.substring(5, incomingString.length()-1);
         LZ = incomingString.toInt();
         Serial.print(LZ);
-      }
+      }*/
 
-      // Process the incoming string as needed
-      // Example: Print the incoming string
-      //Serial.print("Rxvd: ");
-      //Serial.print(incomingString);
-    }
 
-    //Serial.println("a");
-    //delay(100);
-}
