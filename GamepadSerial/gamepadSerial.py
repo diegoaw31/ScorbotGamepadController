@@ -5,7 +5,7 @@ import serial
 
 def read_gamepad():
     # Open the serial port
-    nCom = input("Escriba el número del puerto COM en el que se encuentra el Arduino: ")
+    nCom = 6 #input("Escriba el número del puerto COM en el que se encuentra el Arduino: ")
     serialPort = serial.Serial(f"COM{nCom}", 115200)  # Replace 'COM1' with the appropriate port name.
 
     while True:
@@ -30,10 +30,15 @@ def read_gamepad():
                     data = f"{code[key]}"
                     serialPort.write(data.encode()) #revisar endianness de envío de letras
                     serialPort.write(state.to_bytes(2, byteorder='little', signed=True))
-                    print(data, state)
+                    #print(data, state)
 
-                    read = serialPort.readable()
-                    if read: print("Recibido:" , read)
+                    #for i in range(0, 1000000):
+                    #    pass
+
+                    #read = serialPort.readable()
+                    #if read: 
+                    #    message = serialPort.read(min(20, serialPort.in_waiting))
+                    #    print("Recibido:", message)
         else:
             print("No gamepad found.")
 
