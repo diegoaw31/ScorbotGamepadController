@@ -1,8 +1,20 @@
 #include <String.h>
 
+#define DRIVERUSB 1
+
+#if DRIVERUSB == 1
+
+#define LADO 'L'
+#define XYSW1 'X'   //driver motor 1,2  L,X,Y
+#define XYSW2 'Y'   //driver motor 3,4, R,Y,X
+
+#else
+
 #define LADO 'R'
 #define XYSW1 'Y'   //driver motor 1,2  L,X,Y
 #define XYSW2 'X'   //driver motor 3,4, R,Y,X
+
+#endif
 
 #define LED 13 // LED_BUILTIN
 #define EN_1 9
