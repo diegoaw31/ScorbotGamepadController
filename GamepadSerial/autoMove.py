@@ -7,7 +7,7 @@ import time
 
 def read_gamepad():
     # Open the serial port
-    nCom = 4 #input("Escriba el número del puerto COM en el que se encuentra el Arduino: ")
+    nCom = 6 #input("Escriba el número del puerto COM en el que se encuentra el Arduino: ")
     serialPort = serial.Serial(f"COM{nCom}", 115200)  # Replace 'COM1' with the appropriate port name.
 
     maximop = 32767
@@ -20,24 +20,24 @@ def read_gamepad():
 
         serialPort.write(codigo.encode()) #revisar endianness de envío de letras
         serialPort.write(maximop.to_bytes(2, byteorder='little', signed=True))
-        time.sleep(1.5)
+        time.sleep(1)
 
         serialPort.write(codigo.encode()) #revisar endianness de envío de letras
         serialPort.write(minimop.to_bytes(2, byteorder='little', signed=True))
-        time.sleep(3)
+        time.sleep(1)
 
         serialPort.write(codigo.encode()) #revisar endianness de envío de letras
         serialPort.write(maximop.to_bytes(2, byteorder='little', signed=True))
-        time.sleep(3)
+        time.sleep(1)
 
         serialPort.write(codigo.encode()) #revisar endianness de envío de letras
         serialPort.write(minimop.to_bytes(2, byteorder='little', signed=True))
-        time.sleep(1.5)
+        time.sleep(1)
 
         serialPort.write(codigo.encode()) #revisar endianness de envío de letras
         serialPort.write(cero.to_bytes(2, byteorder='little', signed=True))
 
-        time.sleep(random.uniform(20,40))          
+        #time.sleep(0)          
 
  
 

@@ -5,7 +5,7 @@ import serial
 
 def read_gamepad():
     # Open the serial port
-    nCom = 4 #input("Escriba el número del puerto COM en el que se encuentra el Arduino: ")
+    nCom = 6 #input("Escriba el número del puerto COM en el que se encuentra el Arduino: ")
     serialPort = serial.Serial(f"COM{nCom}", 115200)  # Replace 'COM1' with the appropriate port name.
 
     while True:
