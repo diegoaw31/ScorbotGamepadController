@@ -1,6 +1,6 @@
 #include <String.h>
 
-#define DRIVERUSB 1
+#define DRIVERUSB 0
 
 #if DRIVERUSB == 1
 
